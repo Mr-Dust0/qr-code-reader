@@ -1,12 +1,14 @@
 import subprocess
 from pathlib import Path
 
+
 screen_geometry = subprocess.check_output(
             "xdpyinfo | awk '/dimensions/{print $2}'", shell=True
         ).decode('utf-8').strip()
     #logger.logPdfOpen("/Testing New Layout")
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / "assets/frame0"
+IMAGE_PATH = ASSETS_PATH / Path("image_1.jpg")  
 URL = "https://192.168.5.102"
 output = []
 key_map = {
@@ -29,7 +31,4 @@ key_map = {
     "KEY_KEYBOARD": "err",
         "KEY_LEFTSHIFT":"cap"}
 
-
-def relative_to_assets(path: str) -> Path:
-    return ASSETS_PATH / Path(path)
 

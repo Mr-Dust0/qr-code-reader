@@ -1,12 +1,8 @@
-from pathlib import Path
 from tkinter import Tk, Canvas
 from PIL import Image, ImageTk  
-from config import screen_geometry
-from config import ASSETS_PATH
+from config import IMAGE_PATH, screen_geometry
 
 
-def relative_to_assets(path: str) -> Path:
-    return ASSETS_PATH / Path(path)
 
 
 def create_gui():
@@ -34,9 +30,8 @@ def create_gui():
                            fill="#000000",
                            font=("Inter ExtraBold", int(height * 0.05)))  # Font size relative to screen height
     # Add image in the center between the text and the rectangle using Pillow
-    image_path = relative_to_assets("image_1.jpg")  
     try:
-        img = Image.open(image_path)  
+        img = Image.open(IMAGE_PATH)  
         # Resize image to 20% of screen width/height
         img = img.resize((int(width * 0.2), int(height * 0.2)))  
         img_tk = ImageTk.PhotoImage(img)
