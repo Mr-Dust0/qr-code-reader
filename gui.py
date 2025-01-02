@@ -1,16 +1,15 @@
 from pathlib import Path
 from tkinter import Tk, Canvas
 from PIL import Image, ImageTk  # Import Pillow for image handling
-
-OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / "assets/frame0"
+from config import screen_geometry
+from config import ASSETS_PATH
 
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 
-def create_gui(screen_geometry):
+def create_gui():
     window = Tk()
     window.title("QR Code Reader")
     window.geometry(screen_geometry)

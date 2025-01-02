@@ -1,43 +1,13 @@
 import os
 import time
 import subprocess
-from pathlib import Path
-from tkinter import Tk, Canvas
-from PIL import Image, ImageTk  # Import Pillow for image handling
 from evdev import InputDevice, categorize, ecodes
 import subprocess
 import threading
 import logger
 from gui import create_gui
+from handle_scanner import listen_to_scanner
 
-
-OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / "assets/frame0"
-URL = "https://192.168.5.102"
-output = []
-key_map = {
-    "KEY_A": 'a', "KEY_B": 'b', "KEY_C": 'c', "KEY_D": 'd',
-    "KEY_E": 'e', "KEY_F": 'f', "KEY_G": 'g', "KEY_H": 'h',
-    "KEY_I": 'i', "KEY_J": 'j', "KEY_K": 'k', "KEY_L": 'l',
-    "KEY_M": 'm', "KEY_N": 'n', "KEY_O": 'o', "KEY_P": 'p',
-    "KEY_Q": 'q', "KEY_R": 'r', "KEY_S": 's', "KEY_T": 't',
-    "KEY_U": 'u', "KEY_V": 'v', "KEY_W": 'w', "KEY_X": 'x',
-    "KEY_Y": 'y', "KEY_Z": 'z',
-    "KEY_1": '1', "KEY_2": '2', "KEY_3": '3', "KEY_4": '4',
-    "KEY_5": '5', "KEY_6": '6', "KEY_7": '7', "KEY_8": '8',
-    "KEY_9": '9', "KEY_0": '0',
-    "KEY_BACKSLASH": '\\',  # Handle backslash
-    "KEY_SLASH": '/',      # Handle slash
-    "KEY_DOT": '.',        # Handle dot
-    "KEY_SPACE": ' ',      # Handle space (if you want to allow space between words)
-    "KEY_ENTER": '\n',     # Handle enter
-    "KEY_MINUS": '-',
-    "KEY_KEYBOARD": "err",
-        "KEY_LEFTSHIFT":"cap"}
-
-
-def relative_to_assets(path: str) -> Path:
-    return ASSETS_PATH / Path(path)
 
 
 def open_pdf(file_url: str):
@@ -81,7 +51,7 @@ def handle_file_url(file_url):
             os.system(f'dunstify "Unsported file type {file_url}"')
 
 
-def kill_xpdf(file_url):
+def kill_xpdf():
     try:
          result = subprocess.run(            ["pgrep", "-f",'xpdf'],            stdout=subprocess.PIPE,            stderr=subprocess.PIPE,            text=True        )        # If pgrep found a process, it will have output        return result.returncode == 0
          if result.returncode == 0:
@@ -122,7 +92,7 @@ def get_device_path(notifed):
     return  notifed , device_path.strip()
 
 
-def listen_to_scanner():
+def listen_to_scanner_old():
     try:
         # Open the device
         device_path = ""
@@ -183,6 +153,5 @@ def main():
     #logger.logPdfClose()
     scanner_thread = threading.Thread(target=listen_to_scanner, daemon=True)
     scanner_thread.start()
-    
-    create_gui(screen_geometry)
+    create_gui()
 main()
