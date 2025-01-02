@@ -1,9 +1,4 @@
 import os
-import json
-import requests
-from datetime import datetime
-import logging.handlers
-import logging
 import time
 import subprocess
 from pathlib import Path
@@ -12,9 +7,7 @@ from PIL import Image, ImageTk  # Import Pillow for image handling
 from evdev import InputDevice, categorize, ecodes
 import subprocess
 import threading
-import platform
-
-# Get the hostname of the machine
+import logger
 
 
 OUTPUT_PATH = Path(__file__).parent
@@ -67,7 +60,7 @@ def open_pdf(file_url: str):
             subprocess.Popen(['xpdf', f'{home}/outputdoc.pdf', '-cont', '-geom', screen_geometry])
             time.sleep(3)
         print(file_url)
-        logPdfOpen(file_url)
+        logger.logPdfOpen(file_url)
     except subprocess.CalledProcessError as e:
         print(f"Error opening PDF: {e.output.decode()}")
         os.system(f'dunstify "Error: {e.output.decode()}"')
@@ -93,7 +86,7 @@ def kill_xpdf(file_url):
          if result.returncode == 0:
              subprocess.Popen(['pkill', '-f', 'xpdf'])
              time.sleep(0.5)  # Wait to ensure it terminates
-             logPdfClose()
+             logger.logPdfClose()
              
     except Exception as e:
         print(f"Error killing xpdf: {e}")
@@ -126,81 +119,6 @@ def get_device_path(notifed):
     os.system('dunstify "Connected to the scanner"')
     notifed = False
     return  notifed , device_path.strip()
-
-
-#def logPdfOpen( file: str):
- #   hostname = platform.node()
-  ##  message = f"HOSTNAME={hostname}  FILE={file}"
-    #logger.pdf_log(message)
-
-def logPdfOpen(file: str):
-    current_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-    hostname = platform.node()
-    hostname = "Test"
-    data = {
-        "TimeStamp": current_time,
-        "HostName": hostname,
-        "FileName":file 
-    }
-    headers = {"Content-Type": "application/json"}
-    try:
-        response = requests.post(URL + "/log", data=json.dumps(data), headers=headers, verify=False)
-        print(response.status_code)
-        print(response.text)
-    except Exception as e:
-        print(URL)
-        print(e)
-        print("Cant reach centernal server")
-        os.system('dunstify "Cant reach centeral server"')
-
-def logPdfClose():
-    hostname = platform.node()
-    current_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-    data = {
-        "HostName": hostname,
-        "TimeStampClosed":current_time 
-    }
-    headers = {"Content-Type": "application/json"}
-    try:
-        response = requests.put(URL + "/fileclosed", data=json.dumps(data), headers=headers, verify=False)
-        print(response.status_code)
-        print(response.text)
-    except Exception as e:
-        print(URL)
-        print(e)
-        print("Cant reach centernal server")
-        os.system('dunstify "Cant reach centeral server"')
-
-
-#def logPdfClose(file):
- #   hostname = platform.node()
-  #  message = f"HOSTNAME={hostname}  FILE_CLOSED={file}"
-   # logger.pdf_log(message)
-
-
-def init_logger():
-    logger = logging.getLogger('my_logger')
-    logger.setLevel(logging.DEBUG)  # Set the logging level
-    syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')  # Default on most Linux systems
-# Format the log message
-    formatter = logging.Formatter('%(levelname)s %(message)s')
-    syslog_handler.setFormatter(formatter)
-# Add the syslog handler to the logger
-    logger.addHandler(syslog_handler)
-# Example log messages
-    ALERT_LEVEL_NUM = 45
-    logging.addLevelName(ALERT_LEVEL_NUM, "pdf_log")
-# Create a custom function to log at the custom level
-
-
-    def pdf_log(self, message, *args, **kwargs):
-        if self.isEnabledFor(ALERT_LEVEL_NUM):
-            self._log(ALERT_LEVEL_NUM, message, args, **kwargs)
-
-
-# Add the 'alert' method to the logging.Logger class
-    logging.Logger.pdf_log = pdf_log 
-    return logger
 
 
 def listen_to_scanner():
@@ -318,12 +236,14 @@ def create_gui():
 
 
 def main():
-    global logger
     global screen_geometry
     screen_geometry = subprocess.check_output(
             "xdpyinfo | awk '/dimensions/{print $2}'", shell=True
         ).decode('utf-8').strip()
-    logger = init_logger()
+   # logger[b] = logger
+    #logger = init_logger()
+    logger.logPdfOpen("/Testing New Layout")
+    logger.logPdfClose()
     scanner_thread = threading.Thread(target=listen_to_scanner, daemon=True)
     scanner_thread.start()
     create_gui()
