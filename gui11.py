@@ -19,7 +19,6 @@ import platform
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / "assets/frame0"
-USER_INPUT = []  # Store user input (characters scanned from QR)
 URL = "https://192.168.5.102"
 output = []
 key_map = {
@@ -40,11 +39,7 @@ key_map = {
     "KEY_ENTER": '\n',     # Handle enter
     "KEY_MINUS": '-',
     "KEY_KEYBOARD": "err",
-        "KEY_LEFTSHIFT":"cap"
-    
-
-    # Add more special characters as needed
-}
+        "KEY_LEFTSHIFT":"cap"}
 
 
 def relative_to_assets(path: str) -> Path:
