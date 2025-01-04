@@ -1,8 +1,6 @@
 import os
 import time
 from evdev import InputDevice, categorize, ecodes, list_devices
-import subprocess
-import config
 from config import key_map
 import handle_userinput 
 import inotify.adapters
@@ -11,24 +9,31 @@ import inotify.adapters
 
 output = []
 def get_device_path():
-    # Command to see if the scanner is connected and get the device path
+    # Get all the devices currently connected to the machine looking in /dev/input
     for dev in list_devices():
+        # Check to see if the barcode is already connected
         if "barcode" in InputDevice(dev).name:
             os.system("dunstify 'Scanner Connected'")
+            # Return the path of the barcode scanner normally like /dev/input/event13
             return dev
+    # Alerted user device is not connected
     os.system("dunstify 'Scanner not connected'")
     notifier = inotify.adapters.Inotify()
+    # Watch the /dev/input path for events like an new file being created there
     notifier.add_watch('/dev/input/')
+    # Go through one event after another when they are generated
     for event in notifier.event_gen():
         if event is not None:
-            # print event      # uncomment to see all events generated
+            # If the event is an file creation see if event is in the file name of the created file because all input devices start with event
             if 'IN_CREATE' in event[1]:
                 if "event" in event[3]:
-                    print(event[2] + event[3])
-                    # Need to sleep beacuse when the file is frist 
+                    # Sleep for one second beacuse accessing the file when its first created causes errors
                     time.sleep(1)
-                    os.system("dunstify 'Scanner Connected'")
-                    return event[2] + event[3]
+                    dev = InputDevice(event[2] + event[3])
+                    # See if the newly connected device is the barcode scanner
+                    if "barcode" in dev.name:
+                        os.system("dunstify 'Scanner Connected'")
+                        return event[2] + event[3]
 
 
 def listen_to_scanner():
