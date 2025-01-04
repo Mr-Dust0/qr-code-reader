@@ -9,11 +9,7 @@ screen_geometry = subprocess.check_output(
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / "assets/frame0"
 IMAGE_PATH = ASSETS_PATH / Path("image_1.jpg")  
-#URL = "https://192.168.5.102"
 URL = environ.get('URL')
-if URL == "":
-    print("Please make URL points to the log server")
-    exit(123)
 output = []
 # Keymap is needed to map the input from the evdev InputDevice to actuall characters that can be used
 key_map = {
