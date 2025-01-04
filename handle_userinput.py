@@ -33,7 +33,7 @@ def open_pdf(file_url: str):
         # More than one page
         else:
             os.system('dunstify "This file is going to take longer because it has more than one page."')
-            # Cropt the pdf to get rid of margins so the whole pdf can be displayed on the mointor without scrolling because the end user will only have an scanner as input and have no keyboard and mouse
+            # Crop the pdf to get rid of margins so the whole pdf can be displayed on the mointor without scrolling because the end user will only have an scanner as input and have no keyboard and mouse
             subprocess.Popen(['pdfcrop', file_url, f"{home}/outputdoc.pdf"]).wait()
             subprocess.Popen(['xpdf', f'{home}/outputdoc.pdf', '-cont', '-geom', screen_geometry])
             time.sleep(3)
