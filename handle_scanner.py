@@ -14,6 +14,7 @@ def get_device_path():
     # Command to see if the scanner is connected and get the device path
     for dev in list_devices():
         if "barcode" in InputDevice(dev).name:
+            os.system("dunstify 'Scanner Connected'")
             print(dev)
             return dev
     os.system("dunstify 'Scanner not connected'")
@@ -25,6 +26,8 @@ def get_device_path():
             if 'IN_CREATE' in event[1]:
                 if "event" in event[3]:
                     print(event[2] + event[3])
+                    # Need to sleep beacuse when the file is frist 
+                    time.sleep(1)
                     os.system("dunstify 'Scanner Connected'")
                     return event[2] + event[3]
 
