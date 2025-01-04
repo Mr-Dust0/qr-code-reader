@@ -1,40 +1,53 @@
 import os
 import time
 import subprocess
-from evdev import InputDevice, categorize, ecodes
+from evdev import InputDevice, categorize, ecodes, list_devices
 import subprocess
 from config import key_map
 import handle_userinput 
+import inotify.adapters
 
 
 
 output = []
-def get_device_path(notifed):
+def get_device_path():
     # Command to see if the scanner is connected and get the device path
-    command = "sudo lshw | grep barcode -i -A 3 | tail -n1 | cut -d ':' -f 2"
-    # Using run to make sure the progarms waits until the command runs before carrying on.
-    result = subprocess.run(command, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    device_path = result.stdout
-    # Check if the device is connected
-    if device_path == "":
-        # Check to see if the user has already been notified
-        if not notifed:
-            os.system('dunstify "Scanner disconnected"')
-            notifed  = True
-        return notifed, ""
-    os.system('dunstify "Connected to the scanner"')
-    # Reset notifed boolean so the user is notified next time the scanner disconnects
-    notifed = False
-    return  notifed , device_path.strip()
+    for dev in list_devices():
+        if "barcode" in InputDevice(dev).name:
+            print(dev)
+            return dev
+    os.system("dunstify 'Scanner not connected'")
+    notifier = inotify.adapters.Inotify()
+    notifier.add_watch('/dev/input/')
+    for event in notifier.event_gen():
+        if event is not None:
+            # print event      # uncomment to see all events generated
+            if 'IN_CREATE' in event[1]:
+                if "event" in event[3]:
+                    print(event[2] + event[3])
+                    os.system("dunstify 'Scanner Connected'")
+                    return event[2] + event[3]
 
+    # command = "sudo lshw | grep barcode -i -A 3 | tail -n1 | cut -d ':' -f 2"
+    # # Using run to make sure the progarms waits until the command runs before carrying on.
+    # result = subprocess.run(command, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # device_path = result.stdout
+    # # Check if the device is connected
+    # if device_path == "":
+    #     # Check to see if the user has already been notified
+    #     if not notifed:
+    #         os.system('dunstify "Scanner disconnected"')
+    #         notifed  = True
+    #     return notifed, ""
+    # os.system('dunstify "Connected to the scanner"')
+    # # Reset notifed boolean so the user is notified next time the scanner disconnects
+    # notifed = False
+    # return  notifed , device_path.strip()
+    #
 def listen_to_scanner():
     try:
-        device_path = ""
-        notifed = False
         # Call get_device_path while the device is not conencted
-        while device_path == "":
-            notifed, device_path = get_device_path(notifed)
-            time.sleep(5)
+        device_path = get_device_path()
         scanner = InputDevice(device_path)
         print(f"Listening for input from: {scanner.name}")
         # Store previously pressed keys to avoid duplicates
