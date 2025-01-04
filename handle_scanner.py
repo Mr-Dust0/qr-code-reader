@@ -31,22 +31,7 @@ def get_device_path():
                     os.system("dunstify 'Scanner Connected'")
                     return event[2] + event[3]
 
-    # command = "sudo lshw | grep barcode -i -A 3 | tail -n1 | cut -d ':' -f 2"
-    # # Using run to make sure the progarms waits until the command runs before carrying on.
-    # result = subprocess.run(command, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # device_path = result.stdout
-    # # Check if the device is connected
-    # if device_path == "":
-    #     # Check to see if the user has already been notified
-    #     if not notifed:
-    #         os.system('dunstify "Scanner disconnected"')
-    #         notifed  = True
-    #     return notifed, ""
-    # os.system('dunstify "Connected to the scanner"')
-    # # Reset notifed boolean so the user is notified next time the scanner disconnects
-    # notifed = False
-    # return  notifed , device_path.strip()
-    #
+
 def listen_to_scanner():
     try:
         # Call get_device_path while the device is not conencted
