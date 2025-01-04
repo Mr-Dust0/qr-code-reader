@@ -1,8 +1,8 @@
 import os
 import time
-import subprocess
 from evdev import InputDevice, categorize, ecodes, list_devices
 import subprocess
+import config
 from config import key_map
 import handle_userinput 
 import inotify.adapters
@@ -15,7 +15,6 @@ def get_device_path():
     for dev in list_devices():
         if "barcode" in InputDevice(dev).name:
             os.system("dunstify 'Scanner Connected'")
-            print(dev)
             return dev
     os.system("dunstify 'Scanner not connected'")
     notifier = inotify.adapters.Inotify()

@@ -1,16 +1,21 @@
 import subprocess
 from pathlib import Path
+from os import environ
 
-
+# Needed to display the pdf document full screen and adapt to different mointors
 screen_geometry = subprocess.check_output(
             "xdpyinfo | awk '/dimensions/{print $2}'", shell=True
         ).decode('utf-8').strip()
-    #logger.logPdfOpen("/Testing New Layout")
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / "assets/frame0"
 IMAGE_PATH = ASSETS_PATH / Path("image_1.jpg")  
-URL = "https://192.168.5.102"
+#URL = "https://192.168.5.102"
+URL = environ.get('URL')
+if URL == "":
+    print("Please make URL points to the log server")
+    exit(123)
 output = []
+# Keymap is needed to map the input from the evdev InputDevice to actuall characters that can be used
 key_map = {
     "KEY_A": 'a', "KEY_B": 'b', "KEY_C": 'c', "KEY_D": 'd',
     "KEY_E": 'e', "KEY_F": 'f', "KEY_G": 'g', "KEY_H": 'h',
